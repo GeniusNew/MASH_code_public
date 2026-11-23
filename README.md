@@ -2,7 +2,12 @@
 
 MASH optimizes the harness of a fixed multi-agent system across three execution levels: node-level agent behavior, edge-level information exchange, and graph-level team coordination. It diagnoses failures from recorded execution trajectories, generates executable harness changes, filters candidates against a fixed parent, and freezes the selected harness before test evaluation.
 
+
 ## Method
+
+![Overview of MASH: task execution, structured failure diagnosis, and cross-level constraint generation with three-stage filtering.](assets/mash-method-overview.png)
+
+*MASH executes candidate harnesses, diagnoses failures from trajectory evidence, and generates node-, edge-, and graph-level changes that pass syntax, effectiveness, and robustness checks.*
 
 Each optimization round follows the implementation in `mash/search.py`:
 
@@ -13,6 +18,19 @@ Each optimization round follows the implementation in `mash/search.py`:
 5. Filter each candidate through rule-based syntax and semantic checks, paired evaluation on a small diagnosis subset, and paired evaluation on a separate validation set. Passing candidates enter the next round.
 
 The default normalized gain thresholds are `0.005` for Stage 2 and `0.0025` for Stage 3. Parent scores are freshly paired with each candidate; they are not reused across candidates or stages.
+
+## Quick start: Finance
+
+From the repository root, install the package with Python 3.11 or newer and run one Finance fold:
+
+```bash
+python -m pip install -e .
+python -m examples.finance_quickstart --integration your_project.finance_integration --output outputs/finance-fold-0
+```
+
+The original Finance protocol uses 50 tasks and five folds. This command runs one supplied fold while preserving the Finance defaults, exact-match scoring, native Finance hook contracts, and the shared `Store` used for candidate versions and preflight feedback.
+
+The integration module exports `runner`, `tasks`, `split`, `runtime_context`, and `make_optimizer_client`. The runner exposes `system_id`, `exposed_targets`, and `execute`; `tasks` is a tuple of `Task`; `split` is one Finance `TaskSplit`; `runtime_context` describes each exposed hook's native invocation, inputs, and outputs; and `make_optimizer_client(store)` returns a client with `store` and `complete(...)`. The command prints the frozen harness JSON. 
 
 ## Core files
 
